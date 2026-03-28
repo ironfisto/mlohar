@@ -38,7 +38,18 @@ const TRANSITION_SECTION = {
   duration: 0.3,
 }
 
-const EXPLORING = {
+type LinkItem = {
+  label: string
+  href?: string
+}
+
+const EXPLORING: {
+  learning: LinkItem[]
+  cve: { id: string; title: string; links: LinkItem[] }
+  openSource: LinkItem[]
+  reading: LinkItem[]
+  rfc: LinkItem[]
+} = {
   learning: [
     { label: 'Smart Contract' },
     { label: 'Secure System Design' },
