@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/'
   },
+  icons: {
+    icon: '/ironfist.svg',
+  },
   title: {
     default: 'Nim - Personal website template',
     template: '%s | Nim'

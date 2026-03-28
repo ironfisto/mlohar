@@ -13,7 +13,6 @@ import {
 import Link from 'next/link'
 import { AnimatedBackground } from '@/components/ui/animated-background'
 import {
-  PROJECTS,
   WORK_EXPERIENCE,
   BLOG_POSTS,
   EMAIL,
@@ -37,6 +36,50 @@ const VARIANTS_SECTION = {
 
 const TRANSITION_SECTION = {
   duration: 0.3,
+}
+
+const EXPLORING = {
+  learning: [
+    { label: 'Smart Contract' },
+    { label: 'Secure System Design' },
+    { label: 'Explore Hacking in Undiscovered areas' },
+    { label: 'Assembly' },
+    { label: 'AR/VR' },
+    { label: 'ThreeJS , Android XR' },
+  ],
+  cve: {
+    id: 'CVE-2025-66021',
+    title: 'XSS bypass on OWASP Java HTML Sanitizer Library',
+    links: [
+      { label: 'NVD' },
+      { label: 'POC' },
+    ],
+  },
+  openSource: [{ label: 'Renix' }],
+  reading: [
+    { label: 'Designing Secure Software by Loren Kohnfelder' },
+    { label: 'Hacking The Art Of Exploitation By jon erickson' },
+    { label: 'Practical Reverse Engineering By Bruce Dang' },
+    { label: 'Programming from the Ground Up By Jonathan Bartlett' },
+    { label: 'Mastering Linux Security by Donald A. Tevault' },
+    { label: 'Zero Trust Network by Evan Gilman & Doug Bart' },
+    { label: 'DNS Security Management' },
+    { label: 'Building Multi-Tenant SaaS Architectures by Tod Golding' },
+  ],
+  rfc: [
+    { label: 'The MD5 Message-Digest Algorithm' },
+    {
+      label:
+        'CyberGym: Evaluating AI Agents’ Cybersecurity Capabilities with Real-World Vulnerabilities at Scale',
+    },
+    { label: 'The Security Architecture of the Chromium Browser' },
+    {
+      label:
+        'Cross-Origin State Inference (COSI) Attacks: Leaking Web Site States through XS-Leaks',
+    },
+    { label: 'kvm: the Linux Virtual Machine Monitor' },
+    { label: 'Securing the AI Software Supply Chain' },
+  ],
 }
 
 type ProjectVideoProps = {
@@ -137,8 +180,7 @@ export default function Personal() {
       >
         <div className="flex-1">
           <p className="text-zinc-600 dark:text-zinc-400">
-            Focused on creating intuitive and performant web experiences.
-            Bridging the gap between design and development.
+            Hi, I am Mukul Lohar 👋 I am a Senior Product Security Engineer with expertise in threat modeling, secure code review, and penetration testing across large-scale cloud and on-prem systems. Beyond my professional work, I am deeply passionate about the intersection of space security and emerging technologies in AR/VR, exploring how immersive systems and critical infrastructures can be secured for the future. With a proven track record in bug bounty research for companies like Facebook and Google, I bring both hands-on technical depth and forward-looking curiosity to every challenge I take on.
           </p>
         </div>
       </motion.section>
@@ -147,28 +189,150 @@ export default function Personal() {
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
       >
-        <h3 className="mb-5 text-lg font-medium">Selected Projects</h3>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {PROJECTS.map((project) => (
-            <div key={project.name} className="space-y-2">
-              <div className="relative rounded-2xl bg-zinc-50/40 p-1 ring-1 ring-zinc-200/50 ring-inset dark:bg-zinc-950/40 dark:ring-zinc-800/50">
-                <ProjectVideo src={project.video} />
-              </div>
-              <div className="px-1">
-                <a
-                  className="font-base group relative inline-block font-[450] text-zinc-900 dark:text-zinc-50"
-                  href={project.link}
-                  target="_blank"
-                >
-                  {project.name}
-                  <span className="absolute bottom-0.5 left-0 block h-[1px] w-full max-w-0 bg-zinc-900 dark:bg-zinc-50 transition-all duration-200 group-hover:max-w-full"></span>
-                </a>
-                <p className="text-base text-zinc-600 dark:text-zinc-400">
-                  {project.description}
-                </p>
-              </div>
+        <h3 className="mb-5 text-lg font-medium">Exploring</h3>
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Learning Now
             </div>
-          ))}
+            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+              {EXPLORING.learning.map((item) => (
+                <li key={item.label} className="flex items-start gap-2">
+                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
+            <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                Research
+              </span>
+              <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
+                CVE
+              </span>
+            </div>
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+              {EXPLORING.cve.id}
+            </p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
+              {EXPLORING.cve.title}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {EXPLORING.cve.links.map((link) => (
+                <span
+                  key={link.label}
+                  className="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-zinc-50 transition hover:bg-zinc-800 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
+                >
+                  {link.href ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="no-underline"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    link.label
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+              Reading List
+            </div>
+            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+              {EXPLORING.reading.map((item) => (
+                <li key={item.label} className="flex items-start gap-2">
+                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    item.label
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              Open Source
+            </div>
+            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+              {EXPLORING.openSource.map((item) => (
+                <li key={item.label} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    item.label
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+              RFC & Papers
+            </div>
+            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
+              {EXPLORING.rfc.map((item) => (
+                <li key={item.label} className="flex items-start gap-2">
+                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    item.label
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </motion.section>
 

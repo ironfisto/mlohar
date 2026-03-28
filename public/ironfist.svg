@@ -1,0 +1,10 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ironfist logo">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <path d="M38 36h18v12H50v32h6v12H38V36Zm32 0h20c7 0 12 5 12 12v12c0 5-3 9-8 11l12 21H86l-9-18h-1v18H70V36Zm13 12v12h7c2 0 3-1 3-3v-6c0-2-1-3-3-3h-7Z" fill="#e5e7eb"/>
+</svg>

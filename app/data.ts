@@ -49,77 +49,69 @@ export const PROJECTS: Project[] = [
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
   {
-    company: 'Reglazed Studio',
-    title: 'CEO',
-    start: '2024',
+    company: 'GoDaddy',
+    title: 'Sr Security Engineer',
+    start: '2025',
     end: 'Present',
-    link: 'https://ibelick.com',
+    link: 'https://godaddy.com',
     id: 'work1',
   },
   {
-    company: 'Freelance',
-    title: 'Design Engineer',
-    start: '2022',
-    end: '2024',
-    link: 'https://ibelick.com',
-    id: 'work2',
+    company: 'ServiceNow',
+    title: 'Sr Product Security Engineer',
+    start: '2023',
+    end: '2025',
+    link: 'https://servicenow.com',
+    id: 'work3',
   },
   {
-    company: 'Freelance',
-    title: 'Front-end Developer',
-    start: '2017',
-    end: 'Present',
-    link: 'https://ibelick.com',
-    id: 'work3',
+    company: 'Tokopedia',
+    title: 'Sr. Application Security Engineer',
+    start: '2021',
+    end: '2023',
+    link: 'https://tokopedia.com',
+    id: 'work4',
+  },
+  {
+    company: 'LoginSoft',
+    title: 'SDE - Security Engineer',
+    start: '2021',
+    end: '2021',
+    link: 'https://loginsoft.com',
+    id: 'work5',
+  },
+  {
+    company: 'Orbigo',
+    title: 'Jr Software Engineer',
+    start: '2018',
+    end: '2021',
+    link: 'https://orbigo.com',
+    id: 'work6',
   },
 ]
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    title: 'Exploring the Intersection of Design, AI, and Design Engineering',
-    description: 'How AI is changing the way we design',
-    link: '/blog/exploring-the-intersection-of-design-ai-and-design-engineering',
-    uid: 'blog-1',
-  },
-  {
-    title: 'Why I left my job to start my own company',
-    description:
-      'A deep dive into my decision to leave my job and start my own company',
-    link: '/blog/exploring-the-intersection-of-design-ai-and-design-engineering',
+    title: 'Theoretically Possible to Practical Account Takeover',
+    description: 'A write-up on turning a theoretical account takeover vulnerability into a practical exploit.',
+    link: '/blog/theoretically-possible-to-practical-account-takeover',
     uid: 'blog-2',
-  },
-  {
-    title: 'What I learned from my first year of freelancing',
-    description:
-      'A look back at my first year of freelancing and what I learned',
-    link: '/blog/exploring-the-intersection-of-design-ai-and-design-engineering',
-    uid: 'blog-3',
-  },
-  {
-    title: 'How to Export Metadata from MDX for Next.js SEO',
-    description: 'A guide on exporting metadata from MDX files to leverage Next.js SEO features.',
-    link: '/blog/example-mdx-metadata',
-    uid: 'blog-4',
-  },
+  }
 ]
 
 export const SOCIAL_LINKS: SocialLink[] = [
   {
     label: 'Github',
-    link: 'https://github.com/ibelick',
+    link: 'https://github.com/ironfisto',
   },
   {
     label: 'Twitter',
-    link: 'https://twitter.com/ibelick',
+    link: 'https://twitter.com/ironfisto',
   },
   {
     label: 'LinkedIn',
-    link: 'https://www.linkedin.com/in/ibelick',
-  },
-  {
-    label: 'Instagram',
-    link: 'https://www.instagram.com/ibelick',
+    link: 'https://www.linkedin.com/in/malviyamukul/',
   },
 ]
 
-export const EMAIL = 'your@email.com'
+export const EMAIL = 'mukul.lohar@tokopedia.com'
