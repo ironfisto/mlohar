@@ -114,4 +114,4 @@ export const SOCIAL_LINKS: SocialLink[] = [
   },
 ]
 
-export const EMAIL = 'mukul.lohar@tokopedia.com'
+export const EMAIL = 'm@lohar.me'
