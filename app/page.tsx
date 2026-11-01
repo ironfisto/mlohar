@@ -1,41 +1,33 @@
 'use client'
-import { motion } from 'motion/react'
-import { XIcon } from 'lucide-react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { MotionConfig, motion } from 'motion/react'
+import { ArrowUpRightIcon } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { Spotlight } from '@/components/ui/spotlight'
 import { Magnetic } from '@/components/ui/magnetic'
-import {
-  MorphingDialog,
-  MorphingDialogTrigger,
-  MorphingDialogContent,
-  MorphingDialogClose,
-  MorphingDialogContainer,
-} from '@/components/ui/morphing-dialog'
-import Link from 'next/link'
 import { AnimatedBackground } from '@/components/ui/animated-background'
-import {
-  WORK_EXPERIENCE,
-  BLOG_POSTS,
-  EMAIL,
-  SOCIAL_LINKS,
-} from './data'
+import { cn } from '@/lib/utils'
+import { WORK_EXPERIENCE, BLOG_POSTS, EMAIL, SOCIAL_LINKS } from './data'
 
 const VARIANTS_CONTAINER = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
+      staggerChildren: 0.12,
     },
   },
 }
 
 const VARIANTS_SECTION = {
-  hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
-  visible: { opacity: 1, y: 0, filter: 'blur(0px)' },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
 }
 
 const TRANSITION_SECTION = {
-  duration: 0.3,
+  duration: 0.5,
+  ease: [0.22, 1, 0.36, 1],
 }
 
 type LinkItem = {
@@ -61,10 +53,7 @@ const EXPLORING: {
   cve: {
     id: 'CVE-2025-66021',
     title: 'XSS bypass on OWASP Java HTML Sanitizer Library',
-    links: [
-      { label: 'NVD' },
-      { label: 'POC' },
-    ],
+    links: [{ label: 'NVD' }, { label: 'POC' }],
   },
   openSource: [{ label: 'Renix' }],
   reading: [
@@ -93,53 +82,138 @@ const EXPLORING: {
   ],
 }
 
-type ProjectVideoProps = {
-  src: string
+const CURRENT_JOB = WORK_EXPERIENCE[0]
+
+const FACTS = [
+  { label: 'Now', value: `${CURRENT_JOB.title}, ${CURRENT_JOB.company}` },
+  {
+    label: 'Focus',
+    value: 'Threat modeling, secure code review, penetration testing',
+  },
+  { label: 'Bug bounty', value: 'Facebook, Google' },
+  { label: 'Research', value: EXPLORING.cve.id },
+  { label: 'Interests', value: 'Space security, AR/VR' },
+]
+
+const JOB_STARTS = WORK_EXPERIENCE.map((job) => Number(job.start))
+const TIMELINE_START = Math.min(...JOB_STARTS)
+// Keeps roles that started and ended in the same year visible on the track.
+const MIN_ROLE_YEARS = 0.25
+
+// The page is prerendered, so the clock is read after hydration: the timeline
+// keeps up with "Present" without a rebuild or a hydration mismatch.
+function useTimelineEnd() {
+  const [timelineEnd, setTimelineEnd] = useState(Math.max(...JOB_STARTS) + 1)
+
+  useEffect(() => {
+    setTimelineEnd(new Date().getFullYear() + 1)
+  }, [])
+
+  return timelineEnd
 }
 
-function ProjectVideo({ src }: ProjectVideoProps) {
+function jobSegment(
+  job: (typeof WORK_EXPERIENCE)[number],
+  timelineEnd: number,
+) {
+  const span = timelineEnd - TIMELINE_START
+  const start = Number(job.start)
+  const end = job.end === 'Present' ? timelineEnd : Number(job.end)
+  return {
+    left: `${((start - TIMELINE_START) / span) * 100}%`,
+    width: `${(Math.max(end - start, MIN_ROLE_YEARS) / span) * 100}%`,
+  }
+}
+
+// The section stays static and only its content moves, so anchor links measure
+// the section's resting position rather than its offset pre-reveal position.
+function Reveal({
+  children,
+  className,
+  id,
+}: {
+  children: ReactNode
+  className?: string
+  id: string
+}) {
   return (
-    <MorphingDialog
-      transition={{
-        type: 'spring',
-        bounce: 0,
-        duration: 0.3,
-      }}
+    <section id={id} className={cn('scroll-mt-14', className)}>
+      <motion.div
+        variants={VARIANTS_SECTION}
+        transition={TRANSITION_SECTION}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.05 }}
+      >
+        {children}
+      </motion.div>
+    </section>
+  )
+}
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="px-gutter pt-20 pb-8 -indent-[0.05em] text-[clamp(2.5rem,6vw,6.5rem)] leading-none font-medium tracking-[-0.04em] lg:pt-32 lg:pb-12">
+      {children}
+    </h2>
+  )
+}
+
+// Cells sit on a line-coloured backdrop, so the 1px gaps draw the rules and the
+// spotlight lights them up around the cursor.
+function HairlineGrid({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <div className="bg-line relative py-px">
+      <Spotlight
+        className="bg-[radial-gradient(circle_at_center,var(--accent-fill),transparent_70%)] blur-xl"
+        size={320}
+      />
+      <div className={cn('relative grid gap-px', className)}>{children}</div>
+    </div>
+  )
+}
+
+function Cell({
+  label,
+  aside,
+  className,
+  children,
+}: {
+  label: string
+  aside?: string
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <div className={cn('bg-page px-gutter py-8 lg:py-10', className)}>
+      <div className="text-muted mb-6 flex items-center justify-between font-mono text-xs tracking-normal">
+        <h3>{label}</h3>
+        {aside && <span>{aside}</span>}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function ItemLabel({ item }: { item: LinkItem }) {
+  if (!item.href) {
+    return <>{item.label}</>
+  }
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-accent underline-offset-2 hover:underline"
     >
-      <MorphingDialogTrigger>
-        <video
-          src={src}
-          autoPlay
-          loop
-          muted
-          className="aspect-video w-full cursor-zoom-in rounded-xl"
-        />
-      </MorphingDialogTrigger>
-      <MorphingDialogContainer>
-        <MorphingDialogContent className="relative aspect-video rounded-2xl bg-zinc-50 p-1 ring-1 ring-zinc-200/50 ring-inset dark:bg-zinc-950 dark:ring-zinc-800/50">
-          <video
-            src={src}
-            autoPlay
-            loop
-            muted
-            className="aspect-video h-[50vh] w-full rounded-xl md:h-[70vh]"
-          />
-        </MorphingDialogContent>
-        <MorphingDialogClose
-          className="fixed top-6 right-6 h-fit w-fit rounded-full bg-white p-1"
-          variants={{
-            initial: { opacity: 0 },
-            animate: {
-              opacity: 1,
-              transition: { delay: 0.3, duration: 0.1 },
-            },
-            exit: { opacity: 0, transition: { duration: 0 } },
-          }}
-        >
-          <XIcon className="h-5 w-5 text-zinc-500" />
-        </MorphingDialogClose>
-      </MorphingDialogContainer>
-    </MorphingDialog>
+      {item.label}
+    </a>
   )
 }
 
@@ -147,299 +221,315 @@ function MagneticSocialLink({
   children,
   link,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   link: string
 }) {
   return (
     <Magnetic springOptions={{ bounce: 0 }} intensity={0.3}>
       <a
         href={link}
-        className="group relative inline-flex shrink-0 items-center gap-[1px] rounded-full bg-zinc-100 px-2.5 py-1 text-sm text-black transition-colors duration-200 hover:bg-zinc-950 hover:text-zinc-50 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+        className="group bg-on-accent inline-flex shrink-0 items-center gap-1 rounded-full px-4 py-2 text-white transition-colors duration-200 hover:bg-white hover:text-black"
       >
         {children}
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3"
-        >
-          <path
-            d="M3.64645 11.3536C3.45118 11.1583 3.45118 10.8417 3.64645 10.6465L10.2929 4L6 4C5.72386 4 5.5 3.77614 5.5 3.5C5.5 3.22386 5.72386 3 6 3L11.5 3C11.6326 3 11.7598 3.05268 11.8536 3.14645C11.9473 3.24022 12 3.36739 12 3.5L12 9.00001C12 9.27615 11.7761 9.50001 11.5 9.50001C11.2239 9.50001 11 9.27615 11 9.00001V4.70711L4.35355 11.3536C4.15829 11.5488 3.84171 11.5488 3.64645 11.3536Z"
-            fill="currentColor"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          ></path>
-        </svg>
+        <ArrowUpRightIcon className="h-4 w-4" />
       </a>
     </Magnetic>
   )
 }
 
-export default function Personal() {
+function Hero() {
   return (
-    <motion.main
-      className="space-y-24"
+    <motion.section
+      className="flex flex-col lg:min-h-[calc(100svh-3.5rem)]"
       variants={VARIANTS_CONTAINER}
       initial="hidden"
       animate="visible"
     >
-      <motion.section
+      <motion.div
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
+        className="px-gutter @container pt-6 pb-5 lg:pt-8 lg:pb-7"
       >
-        <div className="flex-1">
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Hi, I am Mukul Lohar 👋 I am a Senior Product Security Engineer with expertise in threat modeling, secure code review, and penetration testing across large-scale cloud and on-prem systems. Beyond my professional work, I am deeply passionate about the intersection of space security and emerging technologies in AR/VR, exploring how immersive systems and critical infrastructures can be secured for the future. With a proven track record in bug bounty research for companies like Facebook and Google, I bring both hands-on technical depth and forward-looking curiosity to every challenge I take on.
+        <h1
+          className="-ml-[0.08em] text-[19cqw] leading-[0.8] font-semibold tracking-[-0.055em] whitespace-nowrap"
+        >
+          Mukul Lohar
+        </h1>
+      </motion.div>
+
+      <motion.div
+        variants={VARIANTS_SECTION}
+        transition={TRANSITION_SECTION}
+        className="bg-line grid flex-1 grid-cols-12 gap-px py-px"
+      >
+        <div className="bg-page relative col-span-12 aspect-[4/3] overflow-hidden md:col-span-4 md:aspect-auto md:min-h-96 lg:col-span-3">
+          <Image
+            src="/image.png"
+            alt="Portrait of Mukul Lohar"
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+            className="origin-[50%_40%] scale-[1.14] object-cover object-[54%_30%]"
+            priority
+          />
+        </div>
+
+        <div className="bg-page px-gutter col-span-12 flex flex-col gap-6 py-8 text-lg leading-[1.35] text-pretty md:col-span-8 md:text-[clamp(1.25rem,1.7vw,2rem)] lg:col-span-6 lg:justify-between lg:py-10">
+          <p>
+            Hi, I am Mukul Lohar 👋 I am a Senior Product Security Engineer with
+            expertise in threat modeling, secure code review, and penetration
+            testing across large-scale cloud and on-prem systems.
+          </p>
+          <p className="text-muted">
+            Beyond my professional work, I am deeply passionate about the
+            intersection of space security and emerging technologies in AR/VR,
+            exploring how immersive systems and critical infrastructures can be
+            secured for the future. With a proven track record in bug bounty
+            research for companies like Facebook and Google, I bring both
+            hands-on technical depth and forward-looking curiosity to every
+            challenge I take on.
           </p>
         </div>
-      </motion.section>
 
-      <motion.section
-        variants={VARIANTS_SECTION}
-        transition={TRANSITION_SECTION}
-      >
-        <h3 className="mb-5 text-lg font-medium">Exploring</h3>
-        <div className="space-y-4">
-          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Learning Now
-            </div>
-            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
-              {EXPLORING.learning.map((item) => (
-                <li key={item.label} className="flex items-start gap-2">
-                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-2 hover:underline"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <span>{item.label}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
-            <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                Research
-              </span>
-              <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
-                CVE
-              </span>
-            </div>
-            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              {EXPLORING.cve.id}
-            </p>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300">
-              {EXPLORING.cve.title}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {EXPLORING.cve.links.map((link) => (
-                <span
-                  key={link.label}
-                  className="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-semibold text-zinc-50 transition hover:bg-zinc-800 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
-                >
-                  {link.href ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="no-underline"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    link.label
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
-              Reading List
-            </div>
-            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
-              {EXPLORING.reading.map((item) => (
-                <li key={item.label} className="flex items-start gap-2">
-                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-2 hover:underline"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    item.label
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              Open Source
-            </div>
-            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
-              {EXPLORING.openSource.map((item) => (
-                <li key={item.label} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-2 hover:underline"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    item.label
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl bg-zinc-50/70 p-4 ring-1 ring-zinc-200/60 ring-inset dark:bg-zinc-950/60 dark:ring-zinc-800/60">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-              RFC & Papers
-            </div>
-            <ul className="space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">
-              {EXPLORING.rfc.map((item) => (
-                <li key={item.label} className="flex items-start gap-2">
-                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-zinc-400 dark:bg-zinc-500" />
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-2 hover:underline"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    item.label
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section
-        variants={VARIANTS_SECTION}
-        transition={TRANSITION_SECTION}
-      >
-        <h3 className="mb-5 text-lg font-medium">Work Experience</h3>
-        <div className="flex flex-col space-y-2">
-          {WORK_EXPERIENCE.map((job) => (
-            <a
-              className="relative overflow-hidden rounded-2xl bg-zinc-300/30 p-[1px] dark:bg-zinc-600/30"
-              href={job.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              key={job.id}
+        <dl className="bg-page px-gutter col-span-12 grid grid-cols-2 content-start gap-x-6 gap-y-6 py-8 md:grid-cols-5 lg:col-span-3 lg:grid-cols-1 lg:content-between lg:py-10">
+          {FACTS.map((fact, index) => (
+            <div
+              key={fact.label}
+              className={cn(index === 0 && 'col-span-2 md:col-span-1')}
             >
-              <Spotlight
-                className="from-zinc-900 via-zinc-800 to-zinc-700 blur-2xl dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-50"
-                size={64}
-              />
-              <div className="relative h-full w-full rounded-[15px] bg-white p-4 dark:bg-zinc-950">
-                <div className="relative flex w-full flex-row justify-between">
-                  <div>
-                    <h4 className="font-normal dark:text-zinc-100">
-                      {job.title}
-                    </h4>
-                    <p className="text-zinc-500 dark:text-zinc-400">
-                      {job.company}
-                    </p>
-                  </div>
-                  <p className="text-zinc-600 dark:text-zinc-400">
-                    {job.start} - {job.end}
-                  </p>
-                </div>
-              </div>
-            </a>
+              <dt className="text-muted mb-1 font-mono text-xs tracking-normal">
+                {fact.label}
+              </dt>
+              <dd>{fact.value}</dd>
+            </div>
           ))}
-        </div>
-      </motion.section>
+        </dl>
+      </motion.div>
+    </motion.section>
+  )
+}
 
-      <motion.section
-        variants={VARIANTS_SECTION}
-        transition={TRANSITION_SECTION}
-      >
-        <h3 className="mb-3 text-lg font-medium">Blog</h3>
-        <div className="flex flex-col space-y-0">
-          <AnimatedBackground
-            enableHover
-            className="h-full w-full rounded-lg bg-zinc-100 dark:bg-zinc-900/80"
-            transition={{
-              type: 'spring',
-              bounce: 0,
-              duration: 0.2,
-            }}
-          >
-            {BLOG_POSTS.map((post) => (
-              <Link
-                key={post.uid}
-                className="-mx-3 rounded-xl px-3 py-3"
-                href={post.link}
-                data-id={post.uid}
+function Exploring() {
+  return (
+    <Reveal id="exploring">
+      <SectionHeading>Exploring</SectionHeading>
+      <HairlineGrid className="grid-cols-6 lg:grid-cols-12">
+        <Cell
+          label="Research"
+          aside="CVE"
+          className="@container col-span-6 lg:col-span-5"
+        >
+          <p className="text-accent font-mono text-[11.4cqw] leading-none font-medium tracking-tight">
+            {EXPLORING.cve.id}
+          </p>
+          <p className="mt-5 text-lg text-pretty">{EXPLORING.cve.title}</p>
+          <div className="mt-6 flex flex-wrap gap-2 font-mono text-xs tracking-normal">
+            {EXPLORING.cve.links.map((link) => (
+              <span
+                key={link.label}
+                className="border-line rounded-full border px-3 py-1"
               >
-                <div className="flex flex-col space-y-1">
-                  <h4 className="font-normal dark:text-zinc-100">
-                    {post.title}
-                  </h4>
-                  <p className="text-zinc-500 dark:text-zinc-400">
-                    {post.description}
-                  </p>
-                </div>
-              </Link>
+                <ItemLabel item={link} />
+              </span>
             ))}
-          </AnimatedBackground>
-        </div>
-      </motion.section>
+          </div>
+        </Cell>
 
-      <motion.section
-        variants={VARIANTS_SECTION}
-        transition={TRANSITION_SECTION}
-      >
-        <h3 className="mb-5 text-lg font-medium">Connect</h3>
-        <p className="mb-5 text-zinc-600 dark:text-zinc-400">
-          Feel free to contact me at{' '}
-          <a className="underline dark:text-zinc-300" href={`mailto:${EMAIL}`}>
-            {EMAIL}
+        <Cell
+          label="Learning Now"
+          className="col-span-6 sm:col-span-3 lg:col-span-4"
+        >
+          <ul className="space-y-2 text-lg">
+            {EXPLORING.learning.map((item) => (
+              <li key={item.label}>
+                <ItemLabel item={item} />
+              </li>
+            ))}
+          </ul>
+        </Cell>
+
+        <Cell
+          label="Open Source"
+          className="col-span-6 sm:col-span-3 lg:col-span-3"
+        >
+          <ul className="space-y-2 text-[clamp(2rem,3.4vw,4rem)] leading-none font-medium tracking-[-0.03em]">
+            {EXPLORING.openSource.map((item) => (
+              <li key={item.label}>
+                <ItemLabel item={item} />
+              </li>
+            ))}
+          </ul>
+        </Cell>
+
+        <Cell label="Reading List" className="col-span-6 lg:col-span-7">
+          <ul className="gap-x-gutter text-lg sm:columns-2">
+            {EXPLORING.reading.map((item) => (
+              <li key={item.label} className="break-inside-avoid pb-3">
+                <ItemLabel item={item} />
+              </li>
+            ))}
+          </ul>
+        </Cell>
+
+        <Cell label="RFC & Papers" className="col-span-6 lg:col-span-5">
+          <ul className="space-y-3 text-lg">
+            {EXPLORING.rfc.map((item) => (
+              <li key={item.label} className="text-pretty">
+                <ItemLabel item={item} />
+              </li>
+            ))}
+          </ul>
+        </Cell>
+      </HairlineGrid>
+    </Reveal>
+  )
+}
+
+function Work() {
+  const timelineEnd = useTimelineEnd()
+  const timelineSpan = timelineEnd - TIMELINE_START
+  const timelineYears = Array.from(
+    { length: timelineSpan },
+    (_, index) => TIMELINE_START + index,
+  )
+
+  return (
+    <Reveal id="work">
+      <SectionHeading>Work Experience</SectionHeading>
+      <HairlineGrid>
+        <div
+          aria-hidden
+          className="bg-page text-muted hidden grid-cols-12 font-mono text-xs tracking-normal md:grid"
+        >
+          <div className="col-span-4" />
+          <div className="col-span-5 flex xl:col-span-6">
+            {timelineYears.map((year) => (
+              <span key={year} className="flex-1 py-2 pl-1.5">
+                {year}
+              </span>
+            ))}
+          </div>
+          <div className="col-span-3 xl:col-span-2" />
+        </div>
+
+        {WORK_EXPERIENCE.map((job) => (
+          <a
+            key={job.id}
+            href={job.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group bg-page hover:bg-wash grid grid-cols-12 transition-colors duration-150"
+          >
+            <div className="pl-gutter col-span-7 py-5 pr-4 md:col-span-4 lg:py-7">
+              <p className="text-[clamp(1.5rem,2.6vw,3.25rem)] leading-tight font-medium tracking-[-0.03em]">
+                {job.company}
+              </p>
+              <p className="text-muted mt-1">{job.title}</p>
+            </div>
+
+            <div
+              aria-hidden
+              className="border-line relative col-span-5 hidden border-r bg-[linear-gradient(to_right,var(--line)_1px,transparent_1px)] md:block xl:col-span-6"
+              style={{ backgroundSize: `${100 / timelineSpan}% 100%` }}
+            >
+              <div
+                className={cn(
+                  'group-hover:bg-accent-fill absolute inset-y-[38%] transition-colors duration-150',
+                  job.end === 'Present' ? 'bg-accent-fill' : 'bg-ink',
+                )}
+                style={jobSegment(job, timelineEnd)}
+              />
+            </div>
+
+            <div className="pr-gutter col-span-5 flex items-start justify-end gap-2 py-5 text-right font-mono text-xs tracking-normal md:col-span-3 md:text-sm lg:py-7 xl:col-span-2">
+              <span className="pt-1 whitespace-nowrap">
+                {job.start} - {job.end}
+              </span>
+              <ArrowUpRightIcon className="text-muted group-hover:text-accent mt-1 hidden h-4 w-4 shrink-0 transition-colors duration-150 lg:block" />
+            </div>
           </a>
-        </p>
-        <div className="flex items-center justify-start space-x-3">
+        ))}
+      </HairlineGrid>
+    </Reveal>
+  )
+}
+
+function Blog() {
+  return (
+    <Reveal id="blog">
+      <SectionHeading>Blog</SectionHeading>
+      <div className="divide-line border-line divide-y border-y">
+        <AnimatedBackground
+          enableHover
+          className="bg-wash h-full w-full"
+          transition={{
+            type: 'spring',
+            bounce: 0,
+            duration: 0.2,
+          }}
+        >
+          {BLOG_POSTS.map((post) => (
+            <Link
+              key={post.uid}
+              href={post.link}
+              data-id={post.uid}
+              className="group flex [&>div]:w-full"
+            >
+              <div className="px-gutter grid gap-4 py-8 md:grid-cols-12 lg:py-12">
+                <h3 className="text-[clamp(1.75rem,3.4vw,4.5rem)] leading-[1.05] font-medium tracking-[-0.03em] text-balance md:col-span-7">
+                  {post.title}
+                </h3>
+                <p className="text-muted text-lg text-pretty md:col-span-4 md:pt-1">
+                  {post.description}
+                </p>
+                <ArrowUpRightIcon className="text-muted group-hover:text-accent hidden h-7 w-7 justify-self-end transition-colors duration-150 md:col-span-1 md:block" />
+              </div>
+            </Link>
+          ))}
+        </AnimatedBackground>
+      </div>
+    </Reveal>
+  )
+}
+
+function Connect() {
+  return (
+    <Reveal
+      id="connect"
+      className="bg-accent-fill text-on-accent mt-20 lg:mt-32"
+    >
+      <div className="px-gutter @container pt-12 pb-10 lg:pt-16 lg:pb-14">
+        <div className="mb-6 text-[clamp(1.25rem,2vw,2.5rem)] leading-tight tracking-[-0.02em]">
+          <h2 className="font-medium">Connect</h2>
+          <p>Feel free to contact me at</p>
+        </div>
+        <a
+          href={`mailto:${EMAIL}`}
+          className="-ml-[0.07em] block text-[18.76cqw] leading-[0.85] font-semibold tracking-[-0.055em] whitespace-nowrap decoration-[0.04em] underline-offset-[0.08em] hover:underline"
+        >
+          {EMAIL}
+        </a>
+        <div className="mt-10 flex flex-wrap items-center gap-3 lg:mt-14">
           {SOCIAL_LINKS.map((link) => (
             <MagneticSocialLink key={link.label} link={link.link}>
               {link.label}
             </MagneticSocialLink>
           ))}
         </div>
-      </motion.section>
-    </motion.main>
+      </div>
+    </Reveal>
+  )
+}
+
+export default function Personal() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <main>
+        <Hero />
+        <Exploring />
+        <Work />
+        <Blog />
+        <Connect />
+      </main>
+    </MotionConfig>
   )
 }

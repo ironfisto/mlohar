@@ -1,35 +1,45 @@
 'use client'
 import { TextEffect } from '@/components/ui/text-effect'
 import Link from 'next/link'
-import Image from 'next/image'
+
+const NAV_LINKS = [
+  { label: 'Exploring', href: '/#exploring' },
+  { label: 'Work', href: '/#work' },
+  { label: 'Blog', href: '/#blog' },
+  { label: 'Connect', href: '/#connect' },
+]
 
 export function Header() {
   return (
-    <header className="mb-8 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Image
-          src="/image.png"
-          alt="Portrait of Mukul Lohar"
-          width={48}
-          height={48}
-          className="h-12 w-12 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-800"
-          priority
-        />
-        <div>
-          <Link href="/" className="font-medium text-black dark:text-white">
-            Mukul Lohar
-          </Link>
-          <TextEffect
-            as="p"
-            preset="fade"
-            per="char"
-            className="text-zinc-600 dark:text-zinc-500"
-            delay={0.5}
-          >
-            Senior Security Engineer
-          </TextEffect>
-        </div>
+    <header className="border-line bg-page/85 px-gutter sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b backdrop-blur-md">
+      <div className="flex items-baseline gap-3 text-sm">
+        <Link href="/" className="font-medium whitespace-nowrap">
+          Mukul Lohar
+        </Link>
+        <TextEffect
+          as="p"
+          preset="fade"
+          per="char"
+          className="text-muted hidden sm:block"
+          delay={0.5}
+        >
+          Senior Security Engineer
+        </TextEffect>
       </div>
+      <nav
+        aria-label="Primary"
+        className="flex h-full items-stretch gap-2.5 text-[13px] min-[400px]:gap-4 md:gap-6 md:text-sm"
+      >
+        {NAV_LINKS.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-muted hover:text-accent flex items-center transition-colors duration-150"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   )
 }

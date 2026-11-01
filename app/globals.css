@@ -2,6 +2,22 @@
 @plugin '@tailwindcss/typography';
 @custom-variant dark (&:is(.dark *));
 
+@theme inline {
+  --color-page: var(--page);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-wash: var(--wash);
+  --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
+  --color-on-accent: var(--on-accent);
+
+  --spacing-gutter: var(--gutter);
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -21,6 +37,18 @@
 }
 
 :root {
+  --page: #ffffff;
+  --ink: #09090b;
+  --muted: #52525b;
+  --line: #e4e4e7;
+  --wash: #f4f4f5;
+  /* International orange: --accent is the text-safe shade of the same hue. */
+  --accent: #c93a00;
+  --accent-fill: #ff4f00;
+  --on-accent: #0a0a0a;
+
+  --gutter: clamp(1rem, 2.5vw, 3rem);
+
   --sh-class: #7aa2f7;
   --sh-sign: #89ddff;
   --sh-string: #9ece6a;
@@ -29,4 +57,29 @@
   --sh-jsxliterals: #7aa2f7;
   --sh-property: #73daca;
   --sh-entity: #e0af68;
+}
+
+.dark {
+  --page: #09090b;
+  --ink: #fafafa;
+  --muted: #a1a1aa;
+  --line: #27272a;
+  --wash: #18181b;
+  --accent: #ff6a2b;
+}
+
+html {
+  /* Scales the whole rem-based layout up so large monitors don't look sparse. */
+  font-size: clamp(100%, 0.35vw + 11px, 137.5%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+::selection {
+  background: var(--accent-fill);
+  color: var(--on-accent);
 }
