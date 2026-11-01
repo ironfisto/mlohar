@@ -16,12 +16,17 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     }) => {
       return (
         <figure>
-          <img src={src} alt={alt} className="rounded-xl" />
-          <figcaption className="text-center">{caption}</figcaption>
+          <img src={src} alt={alt} />
+          <figcaption>{caption}</figcaption>
         </figure>
       )
     },
     code: ({ children, ...props }: ComponentPropsWithoutRef<'code'>) => {
+      // Only fences with a language are code. Highlighting raw HTTP or URLs
+      // would misread them, for example greying out everything after `//`.
+      if (!props.className?.startsWith('language-')) {
+        return <code {...props}>{children}</code>
+      }
       const codeHTML = highlight(children as string)
       return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
     },

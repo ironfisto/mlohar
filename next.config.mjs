@@ -1,4 +1,5 @@
 import createMDX from '@next/mdx';
+import rehypePostSections from './lib/rehype-post-sections.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -21,6 +22,9 @@ const nextConfig = {
 
 const withMDX = createMDX({
   extension: /\.mdx?$/,
+  options: {
+    rehypePlugins: [rehypePostSections],
+  },
 });
 
 export default withMDX(nextConfig);

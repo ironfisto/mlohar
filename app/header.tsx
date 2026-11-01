@@ -11,7 +11,7 @@ const NAV_LINKS = [
 
 export function Header() {
   return (
-    <header className="border-line bg-page/85 px-gutter sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b backdrop-blur-md">
+    <header className="site-header border-line bg-page/85 px-gutter sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b backdrop-blur-md">
       <div className="flex items-baseline gap-3 text-sm">
         <Link href="/" className="font-medium whitespace-nowrap">
           Mukul Lohar

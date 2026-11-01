@@ -1,13 +1,22 @@
 'use client'
 import { TextMorph } from '@/components/ui/text-morph'
 import { ScrollProgress } from '@/components/ui/scroll-progress'
-import { ArrowLeftIcon } from 'lucide-react'
+import {
+  getStoredReadMode,
+  READ_MODE_ATTRIBUTE,
+  storeReadMode,
+} from '@/lib/read-mode'
+import { ArrowLeftIcon, BookOpenIcon } from 'lucide-react'
+import { MotionConfig } from 'motion/react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
+import { Connect } from '../connect'
+import './post.css'
 
 function CopyButton() {
   const [text, setText] = useState('Copy')
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
 
   useEffect(() => {
     setTimeout(() => {
@@ -19,7 +28,7 @@ function CopyButton() {
     <button
       onClick={() => {
         setText('Copied')
-        navigator.clipboard.writeText(currentUrl)
+        navigator.clipboard.writeText(window.location.href)
       }}
       className="font-base text-muted hover:text-accent flex items-center gap-1 text-center text-sm transition-colors"
       type="button"
@@ -30,36 +39,69 @@ function CopyButton() {
   )
 }
 
-type Heading = { id: string; text: string }
-
-function useArticleHeadings(articleRef: React.RefObject<HTMLElement | null>) {
-  const [headings, setHeadings] = useState<Heading[]>([])
-
-  // MDX headings have no ids, so derive them for the outline's anchor links.
-  useEffect(() => {
-    const nodes = articleRef.current?.querySelectorAll('h2') ?? []
-    setHeadings(
-      Array.from(nodes).map((node) => {
-        const text = node.textContent ?? ''
-        node.id ||= text
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, '')
-        return { id: node.id, text }
-      }),
-    )
-  }, [articleRef])
-
-  return headings
+// The first block of the article still on screen, below the sticky bar.
+function findReadingAnchor() {
+  const barBottom =
+    document.querySelector('.post-bar')?.getBoundingClientRect().bottom ?? 0
+  const blocks = document.querySelectorAll('.post-lede > *, .post-body > *')
+  return Array.from(blocks).find(
+    (block) => block.getBoundingClientRect().bottom > barBottom,
+  )
 }
 
-export default function LayoutBlogPost({
-  children,
+function useReadMode() {
+  const [isOn, setIsOn] = useState(false)
+
+  useLayoutEffect(() => {
+    setIsOn(getStoredReadMode())
+  }, [])
+
+  // The attribute lives on <html>, so it must not outlive the post.
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.toggleAttribute(READ_MODE_ATTRIBUTE, isOn)
+    return () => root.removeAttribute(READ_MODE_ATTRIBUTE)
+  }, [isOn])
+
+  const toggle = () => {
+    // Switching changes the page height, so keep the reader on the same block.
+    const anchor = findReadingAnchor()
+    const topBefore = anchor?.getBoundingClientRect().top ?? 0
+    storeReadMode(!isOn)
+    flushSync(() => setIsOn(!isOn))
+    if (anchor) {
+      window.scrollBy({
+        top: anchor.getBoundingClientRect().top - topBefore,
+        behavior: 'instant',
+      })
+    }
+  }
+
+  return { isOn, toggle }
+}
+
+function ReadModeButton({
+  isOn,
+  onClick,
 }: {
-  children: React.ReactNode
+  isOn: boolean
+  onClick: () => void
 }) {
-  const articleRef = useRef<HTMLElement>(null)
-  const headings = useArticleHeadings(articleRef)
+  return (
+    <button
+      type="button"
+      aria-pressed={isOn}
+      onClick={onClick}
+      className="text-muted hover:text-accent inline-flex items-center gap-1.5 text-sm transition-colors"
+    >
+      <BookOpenIcon className="h-3.5 w-3.5" />
+      {isOn ? 'Exit read mode' : 'Read mode'}
+    </button>
+  )
+}
+
+function PostShell({ children }: { children: React.ReactNode }) {
+  const { isOn, toggle } = useReadMode()
 
   return (
     <>
@@ -69,51 +111,35 @@ export default function LayoutBlogPost({
           bounce: 0,
         }}
       />
-
-      <div className="gap-x-gutter px-gutter py-8 lg:grid lg:grid-cols-12 lg:py-16">
-        <aside className="mb-8 lg:col-span-3 lg:mb-0">
-          <div className="flex items-center justify-between lg:sticky lg:top-24 lg:flex-col lg:items-start lg:gap-3">
-            <Link
-              href="/#blog"
-              className="text-muted hover:text-accent inline-flex items-center gap-1.5 text-sm transition-colors"
-            >
-              <ArrowLeftIcon className="h-3.5 w-3.5" />
-              All posts
-            </Link>
-            <CopyButton />
-          </div>
-        </aside>
-
-        {/* The article keeps a readable line length; the rails use the rest. */}
-        <main
-          ref={articleRef}
-          className="prose prose-gray prose-h4:prose-base dark:prose-invert prose-h1:text-[clamp(2rem,3.4vw,3.75rem)] prose-h1:leading-[1.05] prose-h1:font-medium prose-h1:tracking-tight prose-h2:mt-12 prose-h2:scroll-m-20 prose-h2:text-2xl prose-h2:font-medium prose-h3:text-lg prose-h3:font-medium prose-h4:font-medium prose-h5:text-base prose-h5:font-medium prose-h6:text-base prose-h6:font-medium prose-strong:font-medium lg:prose-lg 2xl:prose-xl mx-auto max-w-[36em] min-w-0 pb-12 lg:col-span-6"
+      <div className="post-bar border-line px-gutter flex items-center justify-between gap-4 border-b py-3">
+        <Link
+          href="/blog"
+          className="text-muted hover:text-accent inline-flex items-center gap-1.5 text-sm transition-colors"
         >
-          {children}
-        </main>
-
-        {headings.length > 1 && (
-          <nav aria-label="On this page" className="hidden lg:col-span-3 lg:block">
-            <div className="lg:sticky lg:top-24">
-              <p className="text-muted mb-3 font-mono text-xs tracking-normal">
-                On this page
-              </p>
-              <ul className="space-y-2 text-sm">
-                {headings.map((heading) => (
-                  <li key={heading.id}>
-                    <a
-                      href={`#${heading.id}`}
-                      className="text-muted hover:text-accent transition-colors"
-                    >
-                      {heading.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
-        )}
+          <ArrowLeftIcon className="h-3.5 w-3.5" />
+          All posts
+        </Link>
+        <div className="flex items-center gap-4 md:gap-6">
+          <ReadModeButton isOn={isOn} onClick={toggle} />
+          <CopyButton />
+        </div>
       </div>
+      <main className="post">{children}</main>
     </>
+  )
+}
+
+export default function LayoutBlog({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const isIndex = usePathname() === '/blog'
+
+  return (
+    <MotionConfig reducedMotion="user">
+      {isIndex ? children : <PostShell>{children}</PostShell>}
+      <Connect />
+    </MotionConfig>
   )
 }

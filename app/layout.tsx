@@ -4,6 +4,7 @@ import './globals.css'
 import { Header } from './header'
 import { Footer } from './footer'
 import { ThemeProvider } from 'next-themes'
+import { READ_MODE_INIT_SCRIPT } from '@/lib/read-mode'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -50,6 +51,9 @@ export default function RootLayout({
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: READ_MODE_INIT_SCRIPT }} />
+      </head>
       <body className="bg-page text-ink tracking-tight antialiased">
         <ThemeProvider
           enableSystem={true}

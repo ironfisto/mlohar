@@ -1,0 +1,420 @@
+/* Post structure comes from lib/rehype-post-sections.mjs. */
+.post {
+  --measure: min(100%, 42rem);
+}
+
+.post-label {
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+/* Header */
+.post-header h1 {
+  padding: 1.5rem var(--gutter) 2rem;
+  font-size: clamp(2.5rem, 7.4vw, 10rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.post-intro {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.post-lede,
+.post-meta,
+.post-contents {
+  padding: 2rem var(--gutter);
+}
+
+.post-lede {
+  font-size: clamp(1.25rem, 2vw, 2.25rem);
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.post-lede > * {
+  max-width: min(100%, 36em);
+}
+
+.post-lede > * + * {
+  margin-top: 0.75em;
+}
+
+.post-lede figure {
+  max-width: none;
+  margin-bottom: 1.5rem;
+}
+
+.post-meta,
+.post-contents {
+  border-top: 1px solid var(--line);
+}
+
+.post-contents ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+}
+
+.post-contents a {
+  color: var(--muted);
+  transition: color 150ms;
+}
+
+.post-contents a:hover {
+  color: var(--accent);
+}
+
+/* Sections */
+.post-section {
+  display: grid;
+  scroll-margin-top: 3.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.post-section:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.post-section-head {
+  padding: 2rem var(--gutter) 0;
+}
+
+.post-section-head h2 {
+  font-size: clamp(1.75rem, 2.4vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.post-body {
+  display: flow-root;
+  min-width: 0;
+  padding: 1.25rem var(--gutter) 2.5rem;
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.post-body > * {
+  max-width: var(--measure);
+}
+
+.post-body > * + * {
+  margin-top: 1.25em;
+}
+
+.post-body h3 {
+  margin-top: 2.25em;
+  font-size: 1.25em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.post-body strong {
+  font-weight: 600;
+}
+
+.post-body hr,
+.post-lede hr {
+  border-top: 1px solid var(--line);
+}
+
+.post-body > hr:last-child,
+.post-lede > hr:last-child {
+  display: none;
+}
+
+/* Links */
+.post-lede a,
+.post-body a {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-fill);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  transition: color 150ms;
+}
+
+.post-lede a:hover,
+.post-body a:hover {
+  color: var(--accent);
+}
+
+/* Lists */
+.post-body li {
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.post-body li + li {
+  margin-top: 0.6em;
+}
+
+.post-body li > ul,
+.post-body li > ol {
+  margin-top: 0.6em;
+}
+
+.post-body ul > li::before {
+  position: absolute;
+  top: 0.65em;
+  left: 0.15em;
+  width: 0.4em;
+  height: 0.4em;
+  background: var(--accent-fill);
+  content: '';
+}
+
+.post-body ol {
+  counter-reset: post-step;
+}
+
+.post-body ol > li {
+  counter-increment: post-step;
+}
+
+.post-body ol > li::before {
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+  line-height: 1.83;
+  letter-spacing: 0;
+  content: counter(post-step);
+}
+
+/* Code */
+.post code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0;
+}
+
+.post :not(pre) > code {
+  padding: 0.1em 0.35em;
+  background: var(--wash);
+  font-size: 0.875em;
+}
+
+/* Bleeds to the cell's edges, so code can use the full width of the screen. */
+.post-body > pre {
+  clear: both;
+  max-width: none;
+  margin-inline: calc(var(--gutter) * -1);
+  padding: 1.25rem var(--gutter);
+  overflow-x: auto;
+  border-block: 1px solid var(--line);
+  background: var(--wash);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  text-wrap: nowrap;
+  white-space: pre;
+}
+
+/* Media */
+.post img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.post figcaption {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+/* Notes */
+.post blockquote {
+  padding-left: 1em;
+  border-left: 2px solid var(--accent-fill);
+  color: var(--muted);
+}
+
+@media (min-width: 64rem) {
+  .post {
+    --measure: min(66.666%, 46rem);
+    --note: min(calc(33.333% - var(--gutter)), 22rem);
+  }
+
+  .post-intro,
+  .post-section {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .post-lede,
+  .post-contents {
+    grid-column: 4 / -1;
+    border-left: 1px solid var(--line);
+  }
+
+  .post-lede {
+    grid-row: 1;
+  }
+
+  .post-contents {
+    grid-row: 2;
+    padding-block: 1.25rem;
+  }
+
+  .post-meta {
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 2;
+    border-top: 0;
+  }
+
+  .post-section-head {
+    grid-column: span 3;
+    padding-block: 2.5rem;
+  }
+
+  .post-section-head h2 {
+    position: sticky;
+    top: 5rem;
+  }
+
+  .post-body {
+    grid-column: span 9;
+    padding-block: 2.5rem 3.5rem;
+    font-size: 1.25rem;
+    border-left: 1px solid var(--line);
+  }
+
+  /* Sits in the margin beside the text, directly after the measure. */
+  .post-body > blockquote {
+    float: right;
+    clear: right;
+    width: var(--note);
+    max-width: none;
+    margin-right: calc(100% - var(--measure) - var(--gutter) - var(--note));
+    margin-bottom: 1em;
+    font-size: 0.9em;
+  }
+}
+
+/* Read mode: one quiet column, with everything that isn't the article removed.
+   The attribute is managed by lib/read-mode.ts and app/blog/layout.tsx. */
+html[data-read-mode] .site-header,
+html[data-read-mode] #connect,
+html[data-read-mode] .post-contents,
+html[data-read-mode] .post-meta .post-label {
+  display: none;
+}
+
+html[data-read-mode] .post-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--page);
+}
+
+html[data-read-mode] .post {
+  --measure: 100%;
+  width: min(100%, 44rem);
+  margin-inline: auto;
+  padding: 0 var(--gutter) 5rem;
+}
+
+html[data-read-mode] .post-header h1 {
+  padding: 2.5rem 0 1rem;
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+html[data-read-mode] .post-intro {
+  display: flex;
+  flex-direction: column;
+  border: 0;
+}
+
+html[data-read-mode] .post-meta {
+  order: -1;
+  padding: 0 0 2rem;
+  border: 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+html[data-read-mode] .post-lede {
+  padding: 0;
+  border: 0;
+  font-size: 1.1875rem;
+  line-height: 1.7;
+  letter-spacing: 0;
+}
+
+html[data-read-mode] .post-lede > * {
+  max-width: none;
+}
+
+html[data-read-mode] .post-lede > * + * {
+  margin-top: 1.25em;
+}
+
+html[data-read-mode] .post-section {
+  display: block;
+  margin-top: 2.5rem;
+  scroll-margin-top: 4rem;
+  border: 0;
+}
+
+html[data-read-mode] .post-section-head {
+  padding: 0;
+}
+
+html[data-read-mode] .post-section-head h2 {
+  position: static;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+html[data-read-mode] .post-body {
+  padding: 0.75rem 0 0;
+  border: 0;
+  font-size: 1.1875rem;
+  line-height: 1.7;
+  letter-spacing: 0;
+}
+
+html[data-read-mode] .post-body a,
+html[data-read-mode] .post-lede a {
+  text-decoration-color: currentColor;
+}
+
+html[data-read-mode] .post-body ul > li::before {
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+html[data-read-mode] .post-body ol > li::before {
+  color: var(--muted);
+}
+
+html[data-read-mode] .post-body > pre {
+  margin-inline: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+}
+
+html[data-read-mode] .post-body > blockquote {
+  float: none;
+  width: auto;
+  margin: 1.25em 0 0;
+  border-left-color: var(--line);
+  font-size: inherit;
+}

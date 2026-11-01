@@ -3,12 +3,16 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { MotionConfig, motion } from 'motion/react'
 import { ArrowUpRightIcon } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import {
+  Reveal,
+  TRANSITION_SECTION,
+  VARIANTS_SECTION,
+} from '@/components/ui/reveal'
 import { Spotlight } from '@/components/ui/spotlight'
-import { Magnetic } from '@/components/ui/magnetic'
-import { AnimatedBackground } from '@/components/ui/animated-background'
 import { cn } from '@/lib/utils'
-import { WORK_EXPERIENCE, BLOG_POSTS, EMAIL, SOCIAL_LINKS } from './data'
+import { PostList } from './blog/post-list'
+import { Connect } from './connect'
+import { WORK_EXPERIENCE } from './data'
 
 const VARIANTS_CONTAINER = {
   hidden: { opacity: 0 },
@@ -18,16 +22,6 @@ const VARIANTS_CONTAINER = {
       staggerChildren: 0.12,
     },
   },
-}
-
-const VARIANTS_SECTION = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-}
-
-const TRANSITION_SECTION = {
-  duration: 0.5,
-  ease: [0.22, 1, 0.36, 1],
 }
 
 type LinkItem = {
@@ -125,32 +119,6 @@ function jobSegment(
   }
 }
 
-// The section stays static and only its content moves, so anchor links measure
-// the section's resting position rather than its offset pre-reveal position.
-function Reveal({
-  children,
-  className,
-  id,
-}: {
-  children: ReactNode
-  className?: string
-  id: string
-}) {
-  return (
-    <section id={id} className={cn('scroll-mt-14', className)}>
-      <motion.div
-        variants={VARIANTS_SECTION}
-        transition={TRANSITION_SECTION}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-      >
-        {children}
-      </motion.div>
-    </section>
-  )
-}
-
 function SectionHeading({ children }: { children: ReactNode }) {
   return (
     <h2 className="px-gutter pt-20 pb-8 -indent-[0.05em] text-[clamp(2.5rem,6vw,6.5rem)] leading-none font-medium tracking-[-0.04em] lg:pt-32 lg:pb-12">
@@ -214,26 +182,6 @@ function ItemLabel({ item }: { item: LinkItem }) {
     >
       {item.label}
     </a>
-  )
-}
-
-function MagneticSocialLink({
-  children,
-  link,
-}: {
-  children: ReactNode
-  link: string
-}) {
-  return (
-    <Magnetic springOptions={{ bounce: 0 }} intensity={0.3}>
-      <a
-        href={link}
-        className="group bg-on-accent inline-flex shrink-0 items-center gap-1 rounded-full px-4 py-2 text-white transition-colors duration-200 hover:bg-white hover:text-black"
-      >
-        {children}
-        <ArrowUpRightIcon className="h-4 w-4" />
-      </a>
-    </Magnetic>
   )
 }
 
@@ -457,65 +405,7 @@ function Blog() {
   return (
     <Reveal id="blog">
       <SectionHeading>Blog</SectionHeading>
-      <div className="divide-line border-line divide-y border-y">
-        <AnimatedBackground
-          enableHover
-          className="bg-wash h-full w-full"
-          transition={{
-            type: 'spring',
-            bounce: 0,
-            duration: 0.2,
-          }}
-        >
-          {BLOG_POSTS.map((post) => (
-            <Link
-              key={post.uid}
-              href={post.link}
-              data-id={post.uid}
-              className="group flex [&>div]:w-full"
-            >
-              <div className="px-gutter grid gap-4 py-8 md:grid-cols-12 lg:py-12">
-                <h3 className="text-[clamp(1.75rem,3.4vw,4.5rem)] leading-[1.05] font-medium tracking-[-0.03em] text-balance md:col-span-7">
-                  {post.title}
-                </h3>
-                <p className="text-muted text-lg text-pretty md:col-span-4 md:pt-1">
-                  {post.description}
-                </p>
-                <ArrowUpRightIcon className="text-muted group-hover:text-accent hidden h-7 w-7 justify-self-end transition-colors duration-150 md:col-span-1 md:block" />
-              </div>
-            </Link>
-          ))}
-        </AnimatedBackground>
-      </div>
-    </Reveal>
-  )
-}
-
-function Connect() {
-  return (
-    <Reveal
-      id="connect"
-      className="bg-accent-fill text-on-accent mt-20 lg:mt-32"
-    >
-      <div className="px-gutter @container pt-12 pb-10 lg:pt-16 lg:pb-14">
-        <div className="mb-6 text-[clamp(1.25rem,2vw,2.5rem)] leading-tight tracking-[-0.02em]">
-          <h2 className="font-medium">Connect</h2>
-          <p>Feel free to contact me at</p>
-        </div>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="-ml-[0.07em] block text-[18.76cqw] leading-[0.85] font-semibold tracking-[-0.055em] whitespace-nowrap decoration-[0.04em] underline-offset-[0.08em] hover:underline"
-        >
-          {EMAIL}
-        </a>
-        <div className="mt-10 flex flex-wrap items-center gap-3 lg:mt-14">
-          {SOCIAL_LINKS.map((link) => (
-            <MagneticSocialLink key={link.label} link={link.link}>
-              {link.label}
-            </MagneticSocialLink>
-          ))}
-        </div>
-      </div>
+      <PostList headingLevel="h3" />
     </Reveal>
   )
 }

@@ -49,14 +49,14 @@
 
   --gutter: clamp(1rem, 2.5vw, 3rem);
 
-  --sh-class: #7aa2f7;
-  --sh-sign: #89ddff;
-  --sh-string: #9ece6a;
-  --sh-keyword: #bb9af7;
-  --sh-comment: #565f89;
-  --sh-jsxliterals: #7aa2f7;
-  --sh-property: #73daca;
-  --sh-entity: #e0af68;
+  --sh-class: #1d4ed8;
+  --sh-sign: #52525b;
+  --sh-string: #15803d;
+  --sh-keyword: #7c3aed;
+  --sh-comment: #71717a;
+  --sh-jsxliterals: #1d4ed8;
+  --sh-property: #0f766e;
+  --sh-entity: #b45309;
 }
 
 .dark {
@@ -66,6 +66,15 @@
   --line: #27272a;
   --wash: #18181b;
   --accent: #ff6a2b;
+
+  --sh-class: #7aa2f7;
+  --sh-sign: #89ddff;
+  --sh-string: #9ece6a;
+  --sh-keyword: #bb9af7;
+  --sh-comment: #8089b3;
+  --sh-jsxliterals: #7aa2f7;
+  --sh-property: #73daca;
+  --sh-entity: #e0af68;
 }
 
 html {
